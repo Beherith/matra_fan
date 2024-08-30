@@ -4,6 +4,37 @@
 
 This Arduino code is designed to control a fan system based on environmental data collected from two BME280 sensors (one inside and one outside). The code runs on an ESP8266 microcontroller, which also serves as a Wi-Fi access point with an embedded web server to view logged data. The code includes functionality for reading sensor data, controlling a fan via PWM, logging data to the LittleFS filesystem, and displaying information on an OLED screen.
 
+
+### Conditions That Turn the Fan On
+
+The fan will be turned on if **all** of the following conditions are met:
+
+1. **Sanity Checks Pass**:
+   - **Inside Temperature (tempIn)** is between `-20.0°C` and `50.0°C`.
+   - **Outside Temperature (tempOut)** is between `-20.0°C` and `50.0°C`.
+   - **Inside Humidity (humIn)** is greater than `1.0%`.
+   - **Outside Humidity (humOut)** is greater than `1.0%`.
+   - **Inside Pressure (presIn)** is greater than `100.0 hPa`.
+   - **Outside Pressure (presOut)** is greater than `100.0 hPa`.
+
+2. **Temperature Conditions**:
+   - **Case 1: Warm Outdoors (tempOut > 15.0°C)**:
+     - The fan will turn on **if the outside air is drier than the inside air** (i.e., `moistOut < moistIn`).
+   
+   - **Case 2: Moderate Temperature Outdoors (5.0°C < tempOut <= 15.0°C)**:
+     - The fan will turn on **if the outside air is warmer than the inside air** (`tempOut > tempIn`) **and** the outside air is drier than the inside air (`moistOut < moistIn`).
+
+3. **Special Case: Freezing Outdoors (tempOut <= 5.0°C)**:
+   - The fan **will not** turn on when the outside temperature is near or below freezing, regardless of humidity or moisture content.
+
+### Summary of Fan Activation Logic
+
+- **Warm Outside (> 15.0°C)**: The fan turns on if the outside air is drier than inside.
+- **Moderate Temperature (5.0°C to 15.0°C)**: The fan turns on if the outside air is both warmer and drier than inside.
+- **Cold Outside (≤ 5.0°C)**: The fan remains off to prevent bringing in freezing air.
+
+This logic is designed to optimize indoor air quality and comfort by using the fan to exchange air with the outside when it is beneficial (i.e., when the outside air is warmer and/or drier) while avoiding conditions that could bring in excessively cold or humid air.
+
 ## Features
 
 - **Environmental Monitoring**: Reads temperature, humidity, and pressure from two BME280 sensors.
@@ -95,35 +126,6 @@ The ESP8266 resets itself every 24 hours to prevent potential issues with long-t
 
 The fan in the system is controlled based on the environmental conditions measured by two BME280 sensors, one placed inside and one placed outside. The decision to turn the fan on is based on a set of rules that compare the temperature, humidity, and moisture content between the inside and outside environments.
 
-### Conditions That Turn the Fan On
-
-The fan will be turned on if **all** of the following conditions are met:
-
-1. **Sanity Checks Pass**:
-   - **Inside Temperature (tempIn)** is between `-20.0°C` and `50.0°C`.
-   - **Outside Temperature (tempOut)** is between `-20.0°C` and `50.0°C`.
-   - **Inside Humidity (humIn)** is greater than `1.0%`.
-   - **Outside Humidity (humOut)** is greater than `1.0%`.
-   - **Inside Pressure (presIn)** is greater than `100.0 hPa`.
-   - **Outside Pressure (presOut)** is greater than `100.0 hPa`.
-
-2. **Temperature Conditions**:
-   - **Case 1: Warm Outdoors (tempOut > 15.0°C)**:
-     - The fan will turn on **if the outside air is drier than the inside air** (i.e., `moistOut < moistIn`).
-   
-   - **Case 2: Moderate Temperature Outdoors (5.0°C < tempOut <= 15.0°C)**:
-     - The fan will turn on **if the outside air is warmer than the inside air** (`tempOut > tempIn`) **and** the outside air is drier than the inside air (`moistOut < moistIn`).
-
-3. **Special Case: Freezing Outdoors (tempOut <= 5.0°C)**:
-   - The fan **will not** turn on when the outside temperature is near or below freezing, regardless of humidity or moisture content.
-
-### Summary of Fan Activation Logic
-
-- **Warm Outside (> 15.0°C)**: The fan turns on if the outside air is drier than inside.
-- **Moderate Temperature (5.0°C to 15.0°C)**: The fan turns on if the outside air is both warmer and drier than inside.
-- **Cold Outside (≤ 5.0°C)**: The fan remains off to prevent bringing in freezing air.
-
-This logic is designed to optimize indoor air quality and comfort by using the fan to exchange air with the outside when it is beneficial (i.e., when the outside air is warmer and/or drier) while avoiding conditions that could bring in excessively cold or humid air.
 
 ## Conclusion
 
