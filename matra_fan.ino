@@ -328,15 +328,15 @@ void loop() {
           int ypos = 0;
 
           display.setCursor(0,ypos);
-          display.print("TI="); display.print(tempIn,1);
+          display.print("TI="); display.print(tempIn,1); display.print(" C");
           display.setCursor(64,ypos);
-          display.print("TO="); display.print(tempOut,1);
+          display.print("TO="); display.print(tempOut,1); display.print(" C");
           ypos = ypos + 11;
 
           display.setCursor(0,ypos);
-          display.print("HI="); display.print(humIn,1);
+          display.print("HI="); display.print(humIn,1); display.print("%");
           display.setCursor(64,ypos);
-          display.print("HO="); display.print(humOut,1);
+          display.print("HO="); display.print(humOut,1); display.print("%");
           ypos = ypos + 11;
 
           display.setCursor(0,ypos);
